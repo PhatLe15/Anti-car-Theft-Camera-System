@@ -6,9 +6,8 @@
 ### Table of Contents
 
 - [Description](#description)
-- [Team Members](#Team Members)
 - [Technologies](#Technologies)
-- [How To Use](#how-to-use)
+- [Requirements](#Requirements)
 - [References](#references)
 - [License](#license)
 - [Author Info](#author-info)
