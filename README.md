@@ -37,7 +37,8 @@ An Embedded System that can detect glass breaking sound which trigger camera rec
 - PWM
 - I2C
 - Raspivid
-- Thread and  
+- Threads/Chile fork
+- Mutex/Conditional variable
 
 ## Hardware Tools:
 
