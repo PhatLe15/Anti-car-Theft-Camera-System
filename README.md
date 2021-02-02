@@ -78,7 +78,7 @@ The following **additional** features are implemented:
 
 #### API Reference
 
-##Camera
+## Camera
 ```c
     static pid_t pid = 0;
 
@@ -309,7 +309,7 @@ int servo_position(int position){ //0 25 90 135 180
 
 - Wiring Pi - [WiringPi](http://wiringpi.com)
 - Controlling the Raspberry Pi camera from C - [Ceptimus](http://ceptimus.co.uk/?p=91)
-- RPi and I@C Analog-Digital Converter - [University of Cambridge OpebLabTools](http://openlabtools.eng.cam.ac.uk/Resources/Datalog/RPi_ADS1115/)
+- RPi and I2C Analog-Digital Converter - [University of Cambridge OpebLabTools](http://openlabtools.eng.cam.ac.uk/Resources/Datalog/RPi_ADS1115/)
 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
