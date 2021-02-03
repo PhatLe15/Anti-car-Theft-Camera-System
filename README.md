@@ -28,8 +28,6 @@
 
 An Embedded System that can detect glass breaking sound which trigger camera recording and send notification alert.
 
-#### Technologies
-
 ## Software tools:
 
 - Raspian Linux
@@ -37,7 +35,7 @@ An Embedded System that can detect glass breaking sound which trigger camera rec
 - PWM
 - I2C
 - Raspivid
-- Threads/Chile fork
+- Threads/Child fork
 - Mutex/Conditional variable
 
 ## Hardware Tools:
@@ -347,6 +345,8 @@ SOFTWARE.
 
 - Github - [@PhatLe](https://github.com/PhatLe15)
 - Linkedin - [Phat Le](https://www.linkedin.com/in/phat-tan-le/)
+- Email - [phat.le@sjsu.edu]()
+
 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
