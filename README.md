@@ -6,8 +6,8 @@
 ### Table of Contents
 
 - [Description](#description)
-- [Technologies](#Technologies)
 - [Requirements](#Requirements)
+- [Schematics](#Schematics)
 - [References](#references)
 - [License](#license)
 - [Author Info](#author-info)
@@ -28,7 +28,7 @@
 
 An Embedded System that can detect glass breaking sound which trigger camera recording and send notification alert.
 
-## Software tools:
+### Software tools:
 
 - Raspian Linux
 - WiringPi
@@ -38,7 +38,7 @@ An Embedded System that can detect glass breaking sound which trigger camera rec
 - Threads/Child fork
 - Mutex/Conditional variable
 
-## Hardware Tools:
+### Hardware Tools:
 
 - Raspberry Pi 3B+ - [RaspberryPi Website](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
 - Microphone KY-037 - [Datasheet](https://datasheet4u.com/datasheet-pdf/Joy-IT/KY-037/pdf.php?id=1402047)
@@ -69,7 +69,7 @@ The following **additional** features are implemented:
 - [ ] Create UI Web server that can see live streaming and control from device. 
 
 
-#### Schematics
+## Schematics
 
 - Work in progress
 
@@ -240,7 +240,7 @@ int main() {
 }
 ```
 
-## servo
+## Servo
 
 ```c
 int servo_position(int position);
