@@ -1,6 +1,6 @@
 # Anti-car-Theft-Camera-System
 
-![Project Image](project-image-url)
+![sdfg](https://lh5.googleusercontent.com/B0WokYW12llLMfzxbnLCZsedYxVLgoPfLHYIQxSOqiSRXHG_ViFwIWeDy3ORqUNTv505ZbMPyGT7PE1_Ny7itRbihwW0ctNHGaOMevV0rR9DLmW0Z6l7alKIDWd0yBieNtUe8GuL)
 
 
 ### Table of Contents
@@ -9,14 +9,14 @@
     - [Table of Contents](#table-of-contents)
     - [Team Members](#team-members)
   - [Description](#description)
-    - [Software tools:](#software-tools)
-    - [Hardware Tools:](#hardware-tools)
+    - [Software tools](#software-tools)
+    - [Hardware Tools](#hardware-tools)
   - [Requirements](#requirements)
   - [Schematics](#schematics)
-      - [API Reference](#api-reference)
-  - [Camera](#camera)
-  - [microphone](#microphone)
-  - [Servo](#servo)
+  - [Source Code Reference](#source-code-reference)
+    - [camera.c](#camerac)
+    - [microphone.c](#microphonec)
+    - [servo.c](#servoc)
   - [References](#references)
   - [License](#license)
   - [Author Info](#author-info)
@@ -37,7 +37,9 @@
 
 An Embedded System that can detect glass breaking sound which trigger camera recording and send notification alert.
 
-### Software tools:
+This project was inspired by my living situation inside of a fenced community. Inside is relatively safe, but due to crowding, many are forced to park on the street outside the fence. With some regularity, car burglars will break into these cars at night and steal items. Thus this project’s goal and ultimate requirement is to either catch them in the act and lead to their arrests or, more optimally, dissuade them from stealing. It would provide more security and peace of mind to the residents and perhaps increase property values.
+
+### Software tools
 
 - Raspian Linux
 - WiringPi
@@ -47,13 +49,13 @@ An Embedded System that can detect glass breaking sound which trigger camera rec
 - Threads/Child fork
 - Mutex/Conditional variable
 
-### Hardware Tools:
+### Hardware Tools
 
-- Raspberry Pi 3B+ - [RaspberryPi Website](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
-- Microphone KY-037 - [Datasheet](https://datasheet4u.com/datasheet-pdf/Joy-IT/KY-037/pdf.php?id=1402047)
-- Servo Motor SG90 - [Datasheet](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
-- Analog-Digital Converter: ADS1115 - [Datasheet](https://www.ti.com/lit/ds/symlink/ads1115.pdf?ts=1612287514232&ref_url=https%253A%252F%252Fwww.google.com%252F)
-- Pi Camera Rev 1.3 - [Camera Module Spec](https://www.raspberrypi.org/documentation/hardware/camera/)
+- Raspberry Pi **3B+**  - [RaspberryPi Website](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
+- Microphone **KY-037** - [Datasheet](https://datasheet4u.com/datasheet-pdf/Joy-IT/KY-037/pdf.php?id=1402047)
+- Servo Motor **SG90**  - [Datasheet](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
+- Analog-Digital Converter **ADS1115** - [Datasheet](https://www.ti.com/lit/ds/symlink/ads1115.pdf?ts=1612287514232&ref_url=https%253A%252F%252Fwww.google.com%252F)
+- Pi Camera **Rev 1.3** - [Camera Module Spec](https://www.raspberrypi.org/documentation/hardware/camera/)
 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
@@ -250,7 +252,7 @@ int main() {
 }
 ```
 
-## servo.c
+### servo.c
 
 ```c
 int servo_position(int position);
