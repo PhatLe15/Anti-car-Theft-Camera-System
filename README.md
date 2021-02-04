@@ -5,12 +5,21 @@
 
 ### Table of Contents
 
-- [Description](#description)
-- [Requirements](#Requirements)
-- [Schematics](#Schematics)
-- [References](#references)
-- [License](#license)
-- [Author Info](#author-info)
+- [Anti-car-Theft-Camera-System](#anti-car-theft-camera-system)
+    - [Table of Contents](#table-of-contents)
+    - [Team Members](#team-members)
+  - [Description](#description)
+    - [Software tools:](#software-tools)
+    - [Hardware Tools:](#hardware-tools)
+  - [Requirements](#requirements)
+  - [Schematics](#schematics)
+      - [API Reference](#api-reference)
+  - [Camera](#camera)
+  - [microphone](#microphone)
+  - [Servo](#servo)
+  - [References](#references)
+  - [License](#license)
+  - [Author Info](#author-info)
 
 ### Team Members
 
@@ -18,7 +27,7 @@
 - Archie Macabeo
 - Thien Hoang
 - Katt Owens
-- *Professor Advisor*: Wo-tak Wu
+- ***Professor Advisor*** : Wo-tak Wu
 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
@@ -42,6 +51,7 @@ An Embedded System that can detect glass breaking sound which trigger camera rec
 
 - Raspberry Pi 3B+ - [RaspberryPi Website](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
 - Microphone KY-037 - [Datasheet](https://datasheet4u.com/datasheet-pdf/Joy-IT/KY-037/pdf.php?id=1402047)
+- Servo Motor SG90 - [Datasheet](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
 - Analog-Digital Converter: ADS1115 - [Datasheet](https://www.ti.com/lit/ds/symlink/ads1115.pdf?ts=1612287514232&ref_url=https%253A%252F%252Fwww.google.com%252F)
 - Pi Camera Rev 1.3 - [Camera Module Spec](https://www.raspberrypi.org/documentation/hardware/camera/)
 
@@ -67,16 +77,16 @@ The following **future improvement** features are implemented:
 The following **additional** features are implemented:
 
 - [ ] Create UI Web server that can see live streaming and control from device. 
-
+[Back To The Top](#Anti-car-Theft-Camera-System)
 
 ## Schematics
 
 - Work in progress
 
 
-#### API Reference
+## Source Code Reference
 
-## Camera
+### camera.c
 ```c
     static pid_t pid = 0;
 
@@ -155,7 +165,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-## microphone
+### microphone.c
 ```c
 bool flag = true;
 
@@ -240,7 +250,7 @@ int main() {
 }
 ```
 
-## Servo
+## servo.c
 
 ```c
 int servo_position(int position);
@@ -317,7 +327,7 @@ int servo_position(int position){ //0 25 90 135 180
 
 MIT License
 
-Copyright (c) [2021] [Phat Le]
+Copyright (c) 2021 Phat Le
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -343,8 +353,8 @@ SOFTWARE.
 
 ## Author Info
 
-- Github - [@PhatLe](https://github.com/PhatLe15)
-- Linkedin - [Phat Le](https://www.linkedin.com/in/phat-tan-le/)
+- Github - [PhatLe15](https://github.com/PhatLe15)
+- Linkedin - [phat-tan-le](https://www.linkedin.com/in/phat-tan-le/)
 - Email - [phat.le@sjsu.edu]()
 
 
