@@ -10,29 +10,13 @@
 #include <pthread.h>
 
 bool flag = true;
-//void microphone_init(int handler, int address);
 char *i2c_sound1 = "/dev/i2c-1";
 char *i2c_sound2 = "/dev/i2c-3";
 char *i2c_sound3 = "/dev/i2c-4";
-void sighandler(int sig)
-{
-  if (sig == SIGINT)
-  {
-    flag = false;
-  }
-  else
-  {
-    flag = true;
-  }
-}
 
+void sighandler(int sig);
 void *sound_funct();
 
-// struct i2c_args
-// {
-//   int address;
-//   char *i2c_device;
-// };
 
 //int ADS_address = 0x48;   // Address of our device on the I2C bus
 
@@ -140,4 +124,16 @@ void *sound_funct(char* i2c_device)
   return 0;
 
   close(I2CFile);
+}
+
+void sighandler(int sig)
+{
+  if (sig == SIGINT)
+  {
+    flag = false;
+  }
+  else
+  {
+    flag = true;
+  }
 }
