@@ -10,7 +10,7 @@
 
 bool flag = true;
 
-char *i2c = "/dev/i2c-1";
+//char *i2c = "/dev/i2c-4";
 void sighandler(int sig){
   if(sig == SIGINT){
     flag = false;
@@ -60,20 +60,20 @@ int main() {
   writeBuf[0] = 0;                  // select conversion register 
   write(I2CFile, writeBuf, 1);
   float current = 0;
-  float threshold = 1.6;
+  int16_t threshold = 10000;
   while(1){
     read(I2CFile, readBuf, 2);        // Read the contents of the conversion register into readBuf
 
     val = readBuf[0] << 8 | readBuf[1];   // Combine the two bytes of readBuf into a single 16 bit result
-    current = (float)val*4.096/32767.0;
-    printf("Voltage Reading %f (V) \n", current);    // Print the result to terminal, first convert from binary value to mV
-    // printf("percentage %f %% \n", percentage);
-     float difference = current - threshold;
-    //printf("current is: %f (V) , previous is: %f (V, different: %f) \n", current, previous, difference);
+    printf("binary val: %d\n",val);
     
-    sleep(0.5);//sampling every 0.5 second (reduce for faster sampling)
+    //current = (float)val*4.096/32767.0;
+    //printf("Voltage Reading %f (V) \n", current);    // Print the result to terminal, first convert from binary value to mV
+
+    //check for event
+    int16_t difference = val - threshold;
     if(difference<0){
-      printf("Blow!\n");
+      printf("I2c-3:Blow!\n");
     }
 
     //send signal to stop the process
@@ -82,6 +82,7 @@ int main() {
       exit(0);
     }
     //previous = current;
+    sleep(0.5);//sampling every 0.5 second (reduce for faster sampling)
   }
         
   close(I2CFile);

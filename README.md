@@ -68,10 +68,10 @@ The following **required** functionality is complete:
 * [x] Control servo motors to the desinated position
 * [x] Record video and save to local folder with Date naming
 * [x] Sampling analog signal from sound sensor
+* [x] Sampling from three separate microphone in parallel
 
 The following **future improvement** features are implemented:
-
-* [ ] Sampling from three separate microphone in parallel
+* [ ] Use mutex or semaphore to manage the system 
 * [ ] Detect glass-breaking sound
 * [ ] Move camera to the position where the glass-breaking event occurs and record a video from it
 * [ ] Send alert through SMS
@@ -79,6 +79,8 @@ The following **future improvement** features are implemented:
 The following **additional** features are implemented:
 
 - [ ] Create UI Web server that can see live streaming and control from device. 
+- [ ] Install night vision module to camera
+ 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
 ## Schematics
