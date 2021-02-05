@@ -10,7 +10,7 @@
 
 bool flag = true;
 
-//char *i2c = "/dev/i2c-4";
+char *i2c = "/dev/i2c-4";
 void sighandler(int sig){
   if(sig == SIGINT){
     flag = false;

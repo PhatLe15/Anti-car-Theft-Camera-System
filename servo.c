@@ -8,30 +8,31 @@
 
 int servo_position(int position);
 
+int pin = 22;
 int main(void){
   wiringPiSetupGpio();
   
-  pinMode(17,PWM_OUTPUT);
+  pinMode(22,PWM_OUTPUT);
 
-  softPwmCreate(17,servo_position(2),100);
+  softPwmCreate(pin,servo_position(2),100);
   delay(500);
 
-  softPwmWrite(17,servo_position(0));
+  softPwmWrite(pin,servo_position(0));
   delay(500);
 
-  softPwmWrite(17,servo_position(1));
+  softPwmWrite(pin,servo_position(1));
   delay(500);
 
-    softPwmWrite(17,servo_position(2));
+    softPwmWrite(pin,servo_position(2));
   delay(500);
 
-  softPwmWrite(17,servo_position(3));
+  softPwmWrite(pin,servo_position(3));
   delay(500);
 
-  softPwmWrite(17,servo_position(4));
+  softPwmWrite(pin,servo_position(4));
   delay(500);
 
-  softPwmStop(17);
+  softPwmStop(pin);
   
   return 0;
 }

@@ -69,11 +69,11 @@ The following **required** functionality is complete:
 * [x] Record video and save to local folder with Date naming
 * [x] Sampling analog signal from sound sensor
 * [x] Sampling from three separate microphone in parallel
+* [x] Use mutex or semaphore to manage the system 
 
 The following **future improvement** features are implemented:
-* [ ] Use mutex or semaphore to manage the system 
 * [ ] Detect glass-breaking sound
-* [ ] Move camera to the position where the glass-breaking event occurs and record a video from it
+* [ ] Move camera to the position where the event occur
 * [ ] Send alert through SMS
 
 The following **additional** features are implemented:
