@@ -1,60 +1,58 @@
 #include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include <stdio.h>        
+#include <stdbool.h>      //bool
 #include <unistd.h>
-#include <sys/ioctl.h>
+#include <sys/ioctl.h>     //i2c control
 #include <fcntl.h>         // open
 #include <inttypes.h>      // uint8_t, etc
 #include <linux/i2c-dev.h> // I2C bus definitions
-#include <signal.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <wiringPi.h>
-#include <softPwm.h>
+#include <signal.h>        //stop programm with kernel signal
+#include <pthread.h>      //create 3 threads for sound sensor
+#include <semaphore.h>    //share resource between each thread
+#include <wiringPi.h>     // set gpio pin for servo
+#include <softPwm.h>      // send PWM signal to servo
 
 bool taken = false;
 bool flag = true;
-char *i2c_sound1 = "/dev/i2c-1";
-char *i2c_sound2 = "/dev/i2c-3";
-char *i2c_sound3 = "/dev/i2c-4";
+// char *i2c_sound1 = "/dev/i2c-1";
+// char *i2c_sound2 = "/dev/i2c-3";
+// char *i2c_sound3 = "/dev/i2c-4";
+
+char *i2c_sound[3] = {"/dev/i2c-1","/dev/i2c-3","/dev/i2c-4"};
+
 int who_first = 0;
 sem_t mutex;
 int pos = -1;
-int servo_pin = 22;
 
 void sighandler(int sig);
 void *sound_funct();
 int servo_position(int position);
 
-//int ADS_address = 0x48;   // Address of our device on the I2C bus
-
 int main()
 {
-  pthread_t sound_thread[3]; //create 3 threads for microphone
   int iret[3];
-  //int pos[3];
+  int servo_pin = 25;
+
+  pthread_t sound_thread[3]; //create 3 threads for microphone
   sem_init(&mutex,0,1);
   wiringPiSetupGpio();
-
   pinMode(servo_pin,PWM_OUTPUT);
+  softPwmCreate(servo_pin,servo_position(2),100);
+ 
+while(1){
+  delay(500);//wait for servo to move  
 
   //create 3 threads for sound sampling
-  if(iret[0]=pthread_create(&sound_thread[0], NULL, &sound_funct, i2c_sound1)){
-    printf("Thread creation failed: %d\n", iret[0]);
-  }
-    
-  if(iret[1]=pthread_create(&sound_thread[1], NULL, &sound_funct, i2c_sound2)){
-    printf("Thread creation failed: %d\n", iret[1]);
-  }
-  
-  if(iret[2]=pthread_create(&sound_thread[2], NULL, &sound_funct,i2c_sound3)){
-    printf("Thread creation failed: %d\n", iret[2]);
+  for(int i = 0; i<3; i++){
+    if(iret[i]=pthread_create(&sound_thread[i], NULL, &sound_funct, i2c_sound[i])){
+      printf("Thread creation failed: %d\n", iret[i]);
+    }
   }
 
   //wait till thread complete
   //three sound sensor compete to find the event
   //if a thread found the event first
-  //stop other threads  and return with a location of the event
+  //stop other threads and return with a location of the event
   for(int i= 0; i<3;i++){
     pthread_join(sound_thread[i], NULL);
   }
@@ -62,18 +60,19 @@ int main()
   //check for which sensor detect it first and move the servo to the position
   if(who_first==1){
     printf("Move servo to position %u\n", pos);
-    softPwmCreate(servo_pin,servo_position(2),pos);
   }else if(who_first==2){
     printf("Move servo to position %u\n", pos);
-    softPwmCreate(servo_pin,servo_position(2),pos);
   }else if(who_first == 3){
     printf("Move servo to position %u\n", pos);
-    softPwmCreate(servo_pin,servo_position(2),pos);
   }
-  delay(500); //wait for servo to move
 
+  softPwmWrite(servo_pin,servo_position(pos)); //move servo to the event position
 
+  taken = false;  //restart the found status
+}
+  softPwmStop(servo_pin);
   sem_destroy(&mutex); //destroy semaphore
+
   return 0;
 } //end main
 
@@ -115,7 +114,7 @@ void *sound_funct(char* i2c_device)
   writeBuf[0] = 0;                  // select conversion register 
   write(I2CFile, writeBuf, 1);
 
-  int16_t threshold = 10000;
+  int16_t threshold = 14000;
   int16_t difference = 0;
   while(1){
     if(taken){  //if one of the sensor found the sound stop reading and end the sampling process
@@ -143,13 +142,13 @@ void *sound_funct(char* i2c_device)
         //choose the position and claim the throne :)
         if(i2c_device == "/dev/i2c-1"){
           who_first = 1;
-          pos = 0;
+          pos = 1;
         }else if(i2c_device == "/dev/i2c-3"){
           who_first = 2;
           pos = 2;
         }else{
           who_first = 3;
-          pos = 4;
+          pos = 3;
         }
       }
       sem_post(&mutex); //unlock semaphore
@@ -192,22 +191,22 @@ int servo_position(int position){ //0 25 90 135 or 180 degree
   switch (position)
   {
     case 0:
-      pulse = 1;
-      break;
-    case 1:
       pulse = 5;
       break;
-    case 2:
-      pulse = 9.5;
+    case 1:
+      pulse = 10;
       break;
-    case 3:
+    case 2:
       pulse = 15;
       break;
+    case 3:
+      pulse = 20;
+      break;
     case 4:
-      pulse = 21;
+      pulse = 25;
       break;
     default:
-      pulse = 1;
+      pulse = 5;
       break;
     return pulse;
   }
