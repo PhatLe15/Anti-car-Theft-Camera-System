@@ -68,15 +68,20 @@ The following **required** functionality is complete:
 * [x] Control servo motors to the desinated position
 * [x] Record video and save to local folder with Date naming
 * [x] Sampling analog signal from sound sensor
+  * [x] Use ADC to convert analog from sensor to gpio digital signal
+  * [x] Implement I2C to communicate with ADC  
 * [x] Sampling from three separate microphone in parallel
-* [x] Use mutex or semaphore to manage the system 
+    * [x] Run from different thread
+    * [x] Each thread communicate from different I2C bus
+* [x] Use semaphore to manage the share thread resources 
+* [x] Move camera to the position where the event occur
 
 The following **future improvement** features are implemented:
 * [ ] Detect glass-breaking sound
-* [ ] Move camera to the position where the event occur
 * [ ] Send alert through SMS
 
 The following **additional** features are implemented:
+- [ ] Put everything in a case
 
 - [ ] Create UI Web server that can see live streaming and control from device. 
 - [ ] Install night vision module to camera
@@ -87,6 +92,11 @@ The following **additional** features are implemented:
 
 - Work in progress
 
+## Design methodology
+
+```
+sudo gcc -o microphone microphonex3.c -lwiringPi -lpthread -lrt
+```
 
 ## Source Code Reference
 

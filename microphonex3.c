@@ -12,14 +12,13 @@
 #include <wiringPi.h>     // set gpio pin for servo
 #include <softPwm.h>      // send PWM signal to servo
 
+#include <string.h>
+#include <time.h> 
+
+static pid_t pid = 0;
 bool taken = false;
 bool flag = true;
-// char *i2c_sound1 = "/dev/i2c-1";
-// char *i2c_sound2 = "/dev/i2c-3";
-// char *i2c_sound3 = "/dev/i2c-4";
-
 char *i2c_sound[3] = {"/dev/i2c-1","/dev/i2c-3","/dev/i2c-4"};
-
 int who_first = 0;
 sem_t mutex;
 int pos = -1;
@@ -27,21 +26,25 @@ int pos = -1;
 void sighandler(int sig);
 void *sound_funct();
 int servo_position(int position);
+void startVideo(char *filename, char *options);
+void stopVideo(void);
+
 
 int main()
 {
   int iret[3];
   int servo_pin = 25;
-
   pthread_t sound_thread[3]; //create 3 threads for microphone
+  time_t now;
+  char directory[1000] = "/home/pi/Desktop/HelloWorld/videoFolder/"; //set directory
+
   sem_init(&mutex,0,1);
   wiringPiSetupGpio();
   pinMode(servo_pin,PWM_OUTPUT);
-  softPwmCreate(servo_pin,servo_position(2),100);
+  digitalWrite(servo_pin, LOW);
+   
  
 while(1){
-  delay(500);//wait for servo to move  
-
   //create 3 threads for sound sampling
   for(int i = 0; i<3; i++){
     if(iret[i]=pthread_create(&sound_thread[i], NULL, &sound_funct, i2c_sound[i])){
@@ -66,11 +69,26 @@ while(1){
     printf("Move servo to position %u\n", pos);
   }
 
-  softPwmWrite(servo_pin,servo_position(pos)); //move servo to the event position
+  //move servo to the found position
+  softPwmCreate(servo_pin,servo_position(pos),100); //create pulse only if needed
+  taken = false;                                    //restart the found status
+  delay(500);                                       //wait for servo to move  
+  softPwmStop(servo_pin);                           // stop servo when not needed
 
-  taken = false;  //restart the found status
+  // //record video for 5s
+  // time(&now);                    //get current time as name of file 
+  // strcat(directory,ctime(&now)); //and combine with the directory
+  // strcat(directory,".h264");
+  // printf("Recording video for 5 secs...");
+  // startVideo(directory, "-w 640 -h 480");//-cfx -rot 180"); 
+  // fflush(stdout);
+  // sleep(5);//change recording time here
+  // stopVideo();
+  // printf("\nVideo stopped - exiting in 2 secs.\n");
+  // sleep(2);
+
 }
-  softPwmStop(servo_pin);
+  
   sem_destroy(&mutex); //destroy semaphore
 
   return 0;
@@ -114,7 +132,7 @@ void *sound_funct(char* i2c_device)
   writeBuf[0] = 0;                  // select conversion register 
   write(I2CFile, writeBuf, 1);
 
-  int16_t threshold = 14000;
+  int16_t threshold = 13000;
   int16_t difference = 0;
   while(1){
     if(taken){  //if one of the sensor found the sound stop reading and end the sampling process
@@ -210,5 +228,59 @@ int servo_position(int position){ //0 25 90 135 or 180 degree
       break;
     return pulse;
   }
-
 }
+
+void startVideo(char *filename, char *options) {
+    if ((pid = fork()) == 0) {
+        char **cmd;
+
+        // count tokens in options string
+        int count = 0;
+        char *copy;
+
+        copy = strdup(options);
+        if (strtok(copy, " \t") != NULL) {
+            count = 1;
+            while (strtok(NULL, " \t") != NULL)
+                count++;
+        }
+
+        cmd = malloc((count + 8) * sizeof(char **));
+        free(copy);
+
+        // if any tokens in options, 
+        // copy them to cmd starting at positon[1]
+        if (count) {
+            int i;
+            copy = strdup(options);
+            cmd[1] = strtok(copy, " \t");
+            for (i = 2; i <= count; i++)
+                cmd[i] = strtok(NULL, " \t");
+        }
+
+        // add default options
+        cmd[0] = "raspivid"; // executable name
+        cmd[count + 1] = "-n"; // no preview
+        cmd[count + 2] = "-t"; // default time (overridden by -s)
+                               // but needed for clean exit
+        cmd[count + 3] = "10"; // 10 millisecond (minimum) time for -t
+        cmd[count + 4] = "-s"; // enable USR1 signal to stop recording
+        cmd[count + 5] = "-o"; // output file specifer
+        cmd[count + 6] = filename;
+        cmd[count + 7] = (char *)0; // terminator
+        execv("/usr/bin/raspivid", cmd);
+    }
+}
+
+void stopVideo(void) {
+    if (pid) {
+        kill(pid, 10); // seems to stop with two signals separated
+                       // by 1 second if started with -t 10 parameter
+        sleep(1);
+        kill(pid, 10);
+    }
+}
+
+
+
+
