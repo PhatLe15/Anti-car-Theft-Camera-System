@@ -13,6 +13,9 @@
     - [Hardware Tools](#hardware-tools)
   - [Requirements](#requirements)
   - [Schematics](#schematics)
+  - [Design methodology](#design-methodology)
+    - [main program](#main-program)
+    - [Sound detection thread function](#sound-detection-thread-function)
   - [Source Code Reference](#source-code-reference)
     - [camera.c](#camerac)
     - [microphone.c](#microphonec)
@@ -89,16 +92,33 @@ The following **additional** features are implemented:
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
 ## Schematics
+Since the Raspberry Pi GPIO is not capable of receiving `analog` signal. The microphone sensors will have to go through Analog-to-digital Converter(`ADS1115`) modules which is then communicate with the Raspberry Pi using separate I2C buses to improve throughput.
 
-- Work in progress
+![sdf](https://github.com/PhatLe15/Anti-car-Theft-Camera-System/blob/main/Schematic.png?raw=true)
 
 ## Design methodology
+The initial camera system system is divided into 5 different states as shown in ***Figure*** below. Specifically, the system will not begin its detection and stay in `IDLE` mode if a `START` signal is not asserted. If `START` asserted, the sound sampling and detecion begin in `SOUND DETECTION` mode. The device will continue on this mode until the glass breaking sound is detected that will send a `FOUND` signal to move to the next state. The camera is moved by a servo motor in `MOVE SERVO` mode, then, record a video in the `VIDEO RECORDING` mode. 
 
+
+![sdf](https://github.com/PhatLe15/Anti-car-Theft-Camera-System/blob/main/FSM.png?raw=true)
+
+### main program
+The ***Figure*** below illustrate the design flow of the **main.c** program. The program will first create `3 threads` of sound sampling since it need to actively sampling and analysing the sound in parallel from `3 angles`. When the first thread detect the event, the program will decide that is the angle the servo need to move to and start recording the video. Then, it go back to thread creating and sampling state. 
+
+![sdf](https://github.com/PhatLe15/Anti-car-Theft-Camera-System/blob/main/Main%20Program%20Flow%20Chart.png?raw=true)
+
+### Sound detection thread function
+For the sound detection which is running from 3 different threads, each thread will share a `Found` variable which is protected by `POSIX Semaphore`. If a thread found the event, it will update the global variable position `pos`, and end all threads by aserting the `Found` variable. 
+
+![sdf](https://github.com/PhatLe15/Anti-car-Theft-Camera-System/blob/main/Sound%20sensor%20Flow%20Chart.png?raw=true)
+
+
+## Source Code Reference
+
+Compile code with gcc
 ```
 sudo gcc -o microphone microphonex3.c -lwiringPi -lpthread -lrt
 ```
-
-## Source Code Reference
 
 ### camera.c
 ```c
