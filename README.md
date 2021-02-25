@@ -75,6 +75,8 @@ The initial budget plan for the project was less than or equal to `$150`. Since 
 | Case and Jumper Wires | 1 | 7.49$ |
 | Soldering Tool | 1 | 10.99$ |
 | **Total** |  | 106.43$ |
+
+
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
 ---
