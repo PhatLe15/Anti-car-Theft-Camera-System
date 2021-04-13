@@ -2,8 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <time.h> 
+#include <pthread.h>      
+#include "camera.h"
 
 static pid_t pid = 0;
 
@@ -58,7 +58,7 @@ void stopVideo(void) {
     }
 }
 
-int main(int argc, char **argv) {
+/*void initVideo(void) {
 
     //get current time as name of file and combine with the directory
     time_t now;
@@ -79,4 +79,4 @@ int main(int argc, char **argv) {
     printf("\nVideo stopped - exiting in 2 secs.\n");
     sleep(2);
     return 0;
-}
+}*/

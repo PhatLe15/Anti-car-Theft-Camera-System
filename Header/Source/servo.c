@@ -1,15 +1,18 @@
 #include <wiringPi.h>
 #include <softPwm.h>
 
+#include "servo.h"
+
 
 // void servo_open(){
 //   softPwmWrite(17,)
 // }
 
-int servo_position(int position);
+
 
 int pin = 17;
-int main(void){
+/*int main(void){
+
   wiringPiSetupGpio();
 
   pinMode(pin,PWM_OUTPUT);
@@ -41,7 +44,10 @@ int main(void){
   return 0;
 }
 
-int servo_position(int position){ //0 25 90 135 180
+*/
+//move servo to a specific location
+
+int servo_position(int position){ //0 25 90 135 or 180 degree
   int pulse;
   switch (position)
   {
@@ -65,5 +71,4 @@ int servo_position(int position){ //0 25 90 135 180
       break;
     return pulse;
   }
-
 }
