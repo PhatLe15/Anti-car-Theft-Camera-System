@@ -9,8 +9,8 @@
 #include <signal.h>        //stop programm with kernel signal
 #include <pthread.h>      //create 3 threads for sound sensor
 #include <semaphore.h>    //share resource between each thread
-#include <wiringPi.h>     // set gpio pin for servo
-#include <softPwm.h>      // send PWM signal to servo
+//#include <wiringPi.h>     // set gpio pin for servo
+//#include <softPwm.h>      // send PWM signal to servo
 
 #include <string.h>
 #include <time.h> 
@@ -18,19 +18,11 @@
 #include "camera.h"
 #include "microphone.h"
 #include "servo.h"
+#include "email.h"
 
 static pid_t pid = 0;
-
 char *i2c_sound[3] = {"/dev/i2c-1","/dev/i2c-3","/dev/i2c-4"};
-//int who_first = 0;
-
-
-//void sighandler(int sig);
-//void *sound_funct();
 int servo_position(int position);
-//void startVideo(char *filename, char *options);
-//void stopVideo(void);
-
 
 int main()
 {
@@ -65,10 +57,13 @@ while(1){
   //check for which sensor detect it first and move the servo to the position
   if(pos==1){
     printf("Move servo to position %u\n", pos);
+    sendEmail("  ""Left side breaking detected "" ");
   }else if(pos==2){
     printf("Move servo to position %u\n", pos);
+    sendEmail("  ""Center breaking detected on the left"" ");
   }else if(pos == 3){
     printf("Move servo to position %u\n", pos);
+    sendEmail("  ""Right ride breaking detected on the left"" ");
   }
 
   //move servo to the found position
@@ -90,7 +85,6 @@ while(1){
   // stopVideo();
   // printf("\nVideo stopped - exiting in 2 secs.\n");
   // sleep(2);
-
 }
   
   sem_destroy(&mutex); //destroy semaphore

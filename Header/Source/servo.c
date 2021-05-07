@@ -1,5 +1,5 @@
-#include <wiringPi.h>
-#include <softPwm.h>
+//#include <wiringPi.h>
+//#include <softPwm.h>
 
 #include "servo.h"
 
@@ -11,7 +11,7 @@
 
 
 int pin = 17;
-/*int main(void){
+/*int main(void){ //tesing main
 
   wiringPiSetupGpio();
 
@@ -45,8 +45,8 @@ int pin = 17;
 }
 
 */
-//move servo to a specific location
 
+//move servo to a specific location
 int servo_position(int position){ //0 25 90 135 or 180 degree
   int pulse;
   switch (position)
