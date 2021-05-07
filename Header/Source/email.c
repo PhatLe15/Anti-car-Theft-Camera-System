@@ -7,14 +7,13 @@
 
 static pid_t pid = 0;
 static pid_t pid2 = 0;
-char *cmdEcho[] = { "/bin/echo", " ""Breaking Alert!!!"" ", 0 };
-char *cmdMail[] = { "/usr/bin/mail", "-s","location of the event","email", 0 };
+char *cmdEcho[] = { "/bin/echo", "Location of the Event", 0 };
+char *cmdMail[] = { "/usr/bin/mail", "-s","Breaking Alert!!!","rasp24@gmail.com", 0 };
 
 void runpipe(int pfd[]);  //pass command and rund the pipe
 
 void sendEmail(char *detectAt/*, char *optionsEcho, char *optionsMail*/) {
-        cmdMail[2] = detectAt;
-        cmdMail[3] = "rasp24@gmail.com"; //
+        cmdEcho[1] = detectAt;
         int pid, status;
         int fd[2];
 

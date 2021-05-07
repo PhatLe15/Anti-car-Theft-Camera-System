@@ -26,7 +26,7 @@ int servo_position(int position);
 
 int main()
 {
-  int iret[3];
+  int iret[3]; //thread handler
   int servo_pin = 25;
   pthread_t sound_thread[3]; //create 3 threads for microphone
   time_t now;
