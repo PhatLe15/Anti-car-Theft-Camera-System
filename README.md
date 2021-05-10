@@ -2,7 +2,7 @@
 
 ![sdfg](https://lh5.googleusercontent.com/B0WokYW12llLMfzxbnLCZsedYxVLgoPfLHYIQxSOqiSRXHG_ViFwIWeDy3ORqUNTv505ZbMPyGT7PE1_Ny7itRbihwW0ctNHGaOMevV0rR9DLmW0Z6l7alKIDWd0yBieNtUe8GuL)
 
-
+***Link to Video Demo***: [Click here](https://drive.google.com/file/d/1tRAcBPpMMIhOE4YJsMl3Cke628F7knyF/view?usp=sharing)
 ### Table of Contents
 
 - [Anti-car-Theft-Camera-System](#anti-car-theft-camera-system)
@@ -17,11 +17,13 @@
   - [Design methodology](#design-methodology)
     - [main program](#main-program)
     - [Sound detection thread function](#sound-detection-thread-function)
-  - [Source Code Reference](#source-code-reference)
+  - [Setup and build instruction](#setup-and-build-instruction)
+    - [Install Libraries and packages](#install-libraries-and-packages)
+    - [System Configuration](#system-configuration)
+      - [I2C](#i2c)
+      - [SMTP(send email)](#smtpsend-email)
+      - [Video Directory](#video-directory)
     - [Compile code with gcc](#compile-code-with-gcc)
-    - [camera.c](#camerac)
-    - [microphone.c](#microphonec)
-    - [servo.c](#servoc)
   - [References](#references)
   - [License](#license)
   - [Author Info](#author-info)
@@ -97,14 +99,19 @@ The following **required** functionality is complete:
 * [x] Move camera to the position where the event occur
 
 The following **future improvement** features are implemented:
-* [ ] Detect glass-breaking sound
-* [ ] Send alert through SMS
+* [x] Detect glass-breaking sound
+  * [x] Using bandpass filter
+  * [ ] Using Machine learning
+* [x] Send alert through email
+  * [x] Location of the event
+  * [ ] Compress and attach video
 
 The following **additional** features are implemented:
-- [ ] Put everything in a case
+- [x] Put everything in a case
 
-- [ ] Create UI Web server that can see live streaming and control from device. 
-- [ ] Install night vision module to camera
+- [x] Machine Learning Motion tracking after breaking is detected
+  - [x] Unit Implementation
+  - [ ] Integrate with the system
  
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
@@ -129,238 +136,59 @@ For the sound detection which is running from 3 different threads, each thread w
 
 ![sdf](https://github.com/PhatLe15/Anti-car-Theft-Camera-System/blob/main/Sound%20sensor%20Flow%20Chart.png?raw=true)
 
-## Source Code Reference
+## Setup and build instruction
+### Install Libraries and packages
+Before starting the program, we need to download necessary Libraries and Packages using the command lines as follow:
+
+```
+sudo apt-get install msmtp msmtp-mta
+sudo apt-get install wiringpi
+```
+****Note that the Raspian Pi is currently updated and I2c and Camera feature is enable in the setting***
+
+### System Configuration
+#### I2C
+The first step to run the program is to configure the Linux system files. Since the `GPIO` only have one **I2C** bus. We can add extra content of the file under the directory `root/config.txt` as follow:
+```
+dtoverlay=i2c-gpio,bus=4,i2c_gpio_delay_us=1,i2c_gpio_sda=23,i2c_gpio_scl=24
+dtoverlay=i2c-gpio,bus=3,i2c_gpio_delay_us=1,i2c_gpio_sda=17,i2c_gpio_scl=27
+```
+#### SMTP(send email)
+Then, we need to set up a local SMTP server to communicate with Gmail service by editing the file under the path /etc/msmtprc as follow:
+
+```
+defaults
+auth	on
+tls	on
+tls_trust_file	/etc/ssl/certs/ca-certificates.crt
+logfile	~/.msmtp.log
+
+account	gmail
+host	smtp.gmail.com
+port	587
+
+from	rasppi24@gmail.com
+user	rasppi24@gmail.com
+password	EmailPassword
+
+account default:	gmail
+```
+****Note that we need to use an actual email account and password.***
+
+#### Video Directory
+To select the directory where the evident video is stored, we can change the path inside the main function at `main.c` as follow:
+```
+char directory[1000] = "/home/pi/Desktop/HelloWorld/videoFolder/"; //set directory where video is saved
+```
 
 ### Compile code with gcc
+After all of the above steps are done, we can go ahead and build the main file program using the below command:
 ```
-sudo gcc -o microphone microphonex3.c -lwiringPi -lpthread -lrt
+sudo gcc -o microphone main.c camera.c email.c microphone.c servo.c -lwiringPi -lpthread -lrt
 sudo ./microphone
 ```
 
-### camera.c
-```c
-    static pid_t pid = 0;
-
-void startVideo(char *filename, char *options) {
-    if ((pid = fork()) == 0) {
-        char **cmd;
-
-        // count tokens in options string
-        int count = 0;
-        char *copy;
-
-        copy = strdup(options);
-        if (strtok(copy, " \t") != NULL) {
-            count = 1;
-            while (strtok(NULL, " \t") != NULL)
-                count++;
-        }
-
-        cmd = malloc((count + 8) * sizeof(char **));
-        free(copy);
-
-        // if any tokens in options, 
-        // copy them to cmd starting at positon[1]
-        if (count) {
-            int i;
-            copy = strdup(options);
-            cmd[1] = strtok(copy, " \t");
-            for (i = 2; i <= count; i++)
-                cmd[i] = strtok(NULL, " \t");
-        }
-
-        // add default options
-        cmd[0] = "raspivid"; // executable name
-        cmd[count + 1] = "-n"; // no preview
-        cmd[count + 2] = "-t"; // default time (overridden by -s)
-                               // but needed for clean exit
-        cmd[count + 3] = "10"; // 10 millisecond (minimum) time for -t
-        cmd[count + 4] = "-s"; // enable USR1 signal to stop recording
-        cmd[count + 5] = "-o"; // output file specifer
-        cmd[count + 6] = filename;
-        cmd[count + 7] = (char *)0; // terminator
-        execv("/usr/bin/raspivid", cmd);
-    }
-}
-
-void stopVideo(void) {
-    if (pid) {
-        kill(pid, 10); // seems to stop with two signals separated
-                       // by 1 second if started with -t 10 parameter
-        sleep(1);
-        kill(pid, 10);
-    }
-}
-
-int main(int argc, char **argv) {
-
-    //get current time as name of file and combine with the directory
-    time_t now;
-    time(&now);
-    
-    //set directory
-    char directory[1000] = "/home/pi/Desktop/HelloWorld/videoFolder/";
-    
-    //create name by real time 
-    strcat(directory,ctime(&now));
-    strcat(directory,".h264");
-
-    printf("Recording video for 5 secs...");
-    startVideo(directory, "-cfx 128:128 -rot 180"); 
-    fflush(stdout);
-    sleep(5);//change recording time here
-    stopVideo();
-    printf("\nVideo stopped - exiting in 2 secs.\n");
-    sleep(2);
-    return 0;
-}
-```
-
-### microphone.c
-```c
-bool flag = true;
-
-char *i2c = "/dev/i2c-1";
-void sighandler(int sig){
-  if(sig == SIGINT){
-    flag = false;
-  }else{
-    flag = true;
-  }
-}
-
-int main() {
-  signal(SIGINT, sighandler);
-  int ADS_address = 0x48;   // Address of our device on the I2C bus
-  int I2CFile; //I2c handler
-  
-  uint8_t writeBuf[3];      // Buffer to store the 3 bytes that we write to the I2C device
-  uint8_t readBuf[2];       // 2 byte buffer to store the data read from the I2C device
-  
-  int16_t val;              // Stores the 16 bit value of our ADC conversion
-  
-  I2CFile = open(i2c, O_RDWR);     // Open the I2C device
-  
-  ioctl(I2CFile, I2C_SLAVE, ADS_address);   // Specify the address of the I2C Slave to communicate with
-
-  //microphone_init(I2CFile, ADS_address);
-
-
-  // These three bytes are written to the ADS1115 to set the config register and start a conversion 
-  writeBuf[0] = 1;          // let pointer register to select config reg
-
-  //edit config register
-  writeBuf[1] = 0xC2;       // This sets the 8 MSBs of the config register (bits 15-8) to 11000010  
-  writeBuf[2] = 0x03;       // This sets the 8 LSBs of the config register (bits 7-0) to 00000011
-      
-  // Write writeBuf to the ADS1115, the 3 specifies the number of bytes we are writing,
-  // this begins a single conversion
-  write(I2CFile, writeBuf, 3);  
-
-    // Initialize the buffer used to read data from the ADS1115 to 0
-  readBuf[0]= 0;        
-  readBuf[1]= 0;
-
-  // Wait for the conversion to complete, this requires bit 15 to change from 0->1
-  // while ((readBuf[0] & 0x80) == 0)  // readBuf[0] contains 8 MSBs of config register, AND with 10000000 to select bit 15
-  // {
-  //     read(I2CFile, readBuf, 2);    // Read the config register into readBuf to update the conversion status
-  // }
-
-  writeBuf[0] = 0;                  // select conversion register 
-  write(I2CFile, writeBuf, 1);
-  float current = 0;
-  float threshold = 1.6;
-  while(1){
-    read(I2CFile, readBuf, 2);        // Read the contents of the conversion register into readBuf
-
-    val = readBuf[0] << 8 | readBuf[1];   // Combine the two bytes of readBuf into a single 16 bit result
-    current = (float)val*4.096/32767.0;
-    printf("Voltage Reading %f (V) \n", current);    // Print the result to terminal, first convert from binary value to mV
-    // printf("percentage %f %% \n", percentage);
-     float difference = current - threshold;
-    //printf("current is: %f (V) , previous is: %f (V, different: %f) \n", current, previous, difference);
-    
-    sleep(0.5);//sampling every 0.5 second (reduce for faster sampling)
-    if(difference<0){
-      printf("Blow!\n");
-    }
-
-    //send signal to stop the process
-    if(!flag){
-      close(I2CFile);
-      exit(0);
-    }
-    //previous = current;
-  }
-        
-  close(I2CFile);
-  
-  return 0;
-
-}
-```
-
-### servo.c
-
-```c
-int servo_position(int position);
-
-int main(void){
-  wiringPiSetupGpio();
-  
-  pinMode(17,PWM_OUTPUT);
-
-  softPwmCreate(17,servo_position(2),100);
-  delay(500);
-
-  softPwmWrite(17,servo_position(0));
-  delay(500);
-
-  softPwmWrite(17,servo_position(1));
-  delay(500);
-
-    softPwmWrite(17,servo_position(2));
-  delay(500);
-
-  softPwmWrite(17,servo_position(3));
-  delay(500);
-
-  softPwmWrite(17,servo_position(4));
-  delay(500);
-
-  softPwmStop(17);
-  
-  return 0;
-}
-
-int servo_position(int position){ //0 25 90 135 180
-  int pulse;
-  switch (position)
-  {
-    case 0:
-      pulse = 1;
-      break;
-    case 1:
-      pulse = 5;
-      break;
-    case 2:
-      pulse = 9.5;
-      break;
-    case 3:
-      pulse = 15;
-      break;
-    case 4:
-      pulse = 21;
-      break;
-    default:
-      pulse = 1;
-      break;
-    return pulse;
-  }
-}
-```
-[Back To The Top](#read-me-template)
+[Back To The Top](#Anti-car-Theft-Camera-System)
 
 ---
 
@@ -369,6 +197,8 @@ int servo_position(int position){ //0 25 90 135 180
 - Wiring Pi - [WiringPi](http://wiringpi.com)
 - Controlling the Raspberry Pi camera from C - [Ceptimus](http://ceptimus.co.uk/?p=91)
 - RPi and I2C Analog-Digital Converter - [University of Cambridge OpebLabTools](http://openlabtools.eng.cam.ac.uk/Resources/Datalog/RPi_ADS1115/)
+- Consumer Industrial: Acoustic Glass Break Detector - [Vadym, G. (2019, Dec 12)](https://www.cypress.com/file/141276/download)
+- Arduino Tutorial: simple High-pass, Band-pass and Band-stop Filtering - [Aasvik, M (2016, Mar 10)](https://www.norwegiancreations.com/2016/03/arduino-tutorial-simple-high-pass-band-pass-and-band-stop-filtering/)
 
 [Back To The Top](#Anti-car-Theft-Camera-System)
 
